@@ -1,0 +1,419 @@
+{% extends "vehicles/base.html" %}
+
+{% load vehicle_tags %}
+
+{% block title %}
+    Edit {{ vehicle.make }} {{ vehicle.model }} | Premier Wheels India
+{% endblock %}
+
+{% block content %}
+
+<div class="form-page">
+
+    <div class="form-page-header">
+
+        <a
+            href="{% url 'vehicles:dashboard' %}"
+            class="back-link"
+        >
+            ← Back to My Dashboard
+        </a>
+
+        <span class="section-kicker">
+            SELLER AREA
+        </span>
+
+        <h1>
+            Edit Your Vehicle
+        </h1>
+
+        <p>
+            Update the information for your {{ vehicle.make }} {{ vehicle.model }} listing.
+        </p>
+
+    </div>
+
+
+    <div class="edit-layout">
+
+        <section class="edit-form-card">
+
+            <div class="edit-form-heading">
+
+                <h2>
+                    Vehicle Information
+                </h2>
+
+                <p>
+                    Change any details you want and click Save Changes.
+                </p>
+
+            </div>
+
+
+            {% if form.non_field_errors %}
+
+                <div class="form-errors">
+                    {{ form.non_field_errors }}
+                </div>
+
+            {% endif %}
+
+
+            <form
+                method="POST"
+                enctype="multipart/form-data"
+                class="vehicle-form"
+            >
+
+                {% csrf_token %}
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.make.id_for_label }}">
+                        Make
+                    </label>
+
+                    {{ form.make }}
+
+                    {{ form.make.errors }}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.model.id_for_label }}">
+                        Model
+                    </label>
+
+                    {{ form.model }}
+
+                    {{ form.model.errors }}
+
+                </div>
+
+
+                <div class="two-column-form">
+
+                    <div class="form-group">
+
+                        <label for="{{ form.year.id_for_label }}">
+                            Year
+                        </label>
+
+                        {{ form.year }}
+
+                        {{ form.year.errors }}
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="{{ form.fuel_type.id_for_label }}">
+                            Fuel Type
+                        </label>
+
+                        {{ form.fuel_type }}
+
+                        {{ form.fuel_type.errors }}
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.price.id_for_label }}">
+                        Price
+                    </label>
+
+                    {{ form.price }}
+
+                    {{ form.price.errors }}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.mileage.id_for_label }}">
+                        Mileage
+                    </label>
+
+                    {{ form.mileage }}
+
+                    {{ form.mileage.errors }}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.engine_specs.id_for_label }}">
+                        Engine Specs
+                    </label>
+
+                    {{ form.engine_specs }}
+
+                    {{ form.engine_specs.errors }}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.transmission.id_for_label }}">
+                        Transmission
+                    </label>
+
+                    {{ form.transmission }}
+
+                    {{ form.transmission.errors }}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.location.id_for_label }}">
+                        Location
+                    </label>
+
+                    {{ form.location }}
+
+                    {{ form.location.errors }}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.seller_phone.id_for_label }}">
+                        Seller Phone
+                    </label>
+
+                    {{ form.seller_phone }}
+
+                    {{ form.seller_phone.errors }}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.seller_email.id_for_label }}">
+                        Seller Email
+                    </label>
+
+                    {{ form.seller_email }}
+
+                    {{ form.seller_email.errors }}
+
+                    <small class="field-help">
+                        Buyers can use this email to contact you about this car.
+                    </small>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.short_description.id_for_label }}">
+                        Description
+                    </label>
+
+                    {{ form.short_description }}
+
+                    {{ form.short_description.errors }}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.image.id_for_label }}">
+                        Vehicle Image
+                    </label>
+
+                    {% if vehicle.image %}
+
+                        <div class="current-image-box">
+
+                            <img
+                                src="{{ vehicle.image.url }}"
+                                alt="{{ vehicle.make }} {{ vehicle.model }}"
+                                class="current-vehicle-image"
+                            >
+
+                            <div>
+
+                                <strong>
+                                    Current vehicle image
+                                </strong>
+
+                                <p>
+                                    Leave the image field unchanged if you want to keep this photo.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    {{ form.image }}
+
+                    {{ form.image.errors }}
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label>
+                        Additional Photos
+                    </label>
+
+                    {% if vehicle_photos %}
+
+                        <div class="edit-gallery-grid">
+
+                            {% for photo in vehicle_photos %}
+
+                                <label class="edit-gallery-item">
+
+                                    <img
+                                        src="{{ photo.image.url }}"
+                                        alt="{{ vehicle.make }} {{ vehicle.model }} photo {{ forloop.counter }}"
+                                    >
+
+                                    <span class="edit-gallery-delete">
+
+                                        <input
+                                            type="checkbox"
+                                            name="delete_photo_ids"
+                                            value="{{ photo.pk }}"
+                                        >
+
+                                        Remove this photo
+
+                                    </span>
+
+                                </label>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <p class="field-help">
+                            No additional photos have been uploaded yet.
+                        </p>
+
+                    {% endif %}
+
+
+                    <input
+                        type="file"
+                        name="photos"
+                        id="id_edit_photos"
+                        class="input image-input"
+                        accept="image/*"
+                        multiple
+                    >
+
+                    <small class="field-help">
+                        Add more photos. You can keep up to 8 additional photos.
+                    </small>
+
+                </div>
+
+
+                <div class="edit-form-actions">
+
+                    <a
+                        href="{% url 'vehicles:dashboard' %}"
+                        class="cancel-button"
+                    >
+                        Cancel
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="submit-button"
+                    >
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <aside class="edit-preview-card">
+
+            <span class="section-kicker">
+                CURRENT LISTING
+            </span>
+
+            {% if vehicle.image %}
+
+                <img
+                    src="{{ vehicle.image.url }}"
+                    alt="{{ vehicle.make }} {{ vehicle.model }}"
+                    class="edit-preview-image"
+                >
+
+            {% else %}
+
+                <div class="edit-preview-placeholder">
+                    🚗
+                </div>
+
+            {% endif %}
+
+
+            <h2>
+                {{ vehicle.make }} {{ vehicle.model }}
+            </h2>
+
+            <p class="edit-preview-year">
+                {{ vehicle.year }} model
+            </p>
+
+            <strong class="edit-preview-price">
+                {{ vehicle.price|indian_currency }}
+            </strong>
+
+            <div class="edit-preview-meta">
+
+                <span>
+                    🛣 {{ vehicle.mileage|indian_number }} km
+                </span>
+
+                <span>
+                    ⛽ {{ vehicle.fuel_type }}
+                </span>
+
+                <span>
+                    ⚙️ {{ vehicle.transmission }}
+                </span>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,177 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{% block title %}Premier Wheels India{% endblock %}</title>
+
+    <meta
+        name="description"
+        content="Buy and sell certified pre-owned cars in India."
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'vehicles/styles.css' %}"
+    >
+
+</head>
+
+<body>
+
+<header class="site-header">
+
+    <div class="header-glow header-glow-one"></div>
+    <div class="header-glow header-glow-two"></div>
+
+    <div class="header-content">
+
+        <a
+            href="{% url 'vehicles:home' %}"
+            class="brand"
+        >
+            <span class="brand-icon">🚗</span>
+
+            <span>
+                <strong>Premier Wheels</strong>
+                <small>INDIA</small>
+            </span>
+        </a>
+
+
+        <p class="site-tagline">
+            Buy & sell trusted pre-owned cars with confidence.
+        </p>
+
+
+        <nav class="main-nav">
+
+            <a
+                href="{% url 'vehicles:home' %}"
+                class="nav-button nav-light"
+            >
+                Browse Cars
+            </a>
+
+            <a
+                href="{% url 'vehicles:premier_match' %}"
+                class="nav-button nav-outline"
+            >
+                ✦ Find My Match
+            </a>
+
+
+            {% if user.is_authenticated %}
+
+                <a
+                    href="{% url 'vehicles:dashboard' %}"
+                    class="nav-button nav-light"
+                >
+                    My Dashboard
+                </a>
+
+
+                <a
+                    href="{% url 'vehicles:favorites' %}"
+                    class="nav-button nav-outline"
+                >
+                    ♥ Saved Cars
+                </a>
+
+                <a
+                    href="{% url 'vehicles:logout' %}"
+                    class="nav-button nav-outline"
+                >
+                    Logout
+                </a>
+
+            {% else %}
+
+                <a
+                    href="{% url 'vehicles:login' %}"
+                    class="nav-button nav-light"
+                >
+                    Login
+                </a>
+
+                <a
+                    href="{% url 'vehicles:register' %}"
+                    class="nav-button nav-outline"
+                >
+                    Register
+                </a>
+
+            {% endif %}
+
+        </nav>
+
+    </div>
+
+</header>
+
+
+{% if messages %}
+
+    <div class="messages">
+
+        {% for message in messages %}
+
+            <div class="message">
+                <span>✓</span>
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+{% endif %}
+
+
+<main>
+
+    {% block content %}
+
+    {% endblock %}
+
+</main>
+
+
+<footer class="site-footer">
+
+    <div>
+
+        <strong>
+            Premier Wheels India
+        </strong>
+
+        <p>
+            A simple marketplace for buying and selling used cars.
+        </p>
+
+    </div>
+
+
+    <p class="footer-copy">
+        © 2026 Premier Wheels India
+    </p>
+
+</footer>
+
+
+<script
+    src="{% static 'vehicles/script.js' %}"
+></script>
+
+</body>
+
+</html>

@@ -1,0 +1,277 @@
+{% extends "vehicles/base.html" %}
+
+{% load vehicle_tags %}
+
+{% block title %}
+    PremierMatch | Premier Wheels India
+{% endblock %}
+
+{% block content %}
+
+<div class="match-page">
+
+    <div class="match-hero">
+
+        <span class="section-kicker">
+            PREMIER WHEELS SMART MATCH
+        </span>
+
+        <h1>
+            🎯 Find the right car for you
+        </h1>
+
+        <p>
+            Tell us what matters to you. PremierMatch uses a transparent,
+            rule-based scoring system to compare your preferences with
+            available listings — no AI or black box involved.
+        </p>
+
+    </div>
+
+
+    <form method="GET" class="match-form-card">
+
+        <div class="match-form-heading">
+
+            <h2>Your preferences</h2>
+
+            <p>
+                Leave a field open when you do not have a strict requirement.
+            </p>
+
+        </div>
+
+
+        <div class="match-form-grid">
+
+            <div class="form-group">
+                <label for="{{ form.budget_min.id_for_label }}">Minimum Budget</label>
+                {{ form.budget_min }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.budget_max.id_for_label }}">Maximum Budget</label>
+                {{ form.budget_max }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.fuel_type.id_for_label }}">Fuel</label>
+                {{ form.fuel_type }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.transmission.id_for_label }}">Transmission</label>
+                {{ form.transmission }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.min_year.id_for_label }}">Minimum Year</label>
+                {{ form.min_year }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.max_mileage.id_for_label }}">Maximum Mileage</label>
+                {{ form.max_mileage }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.location.id_for_label }}">Location</label>
+                {{ form.location }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.priority.id_for_label }}">What matters most?</label>
+                {{ form.priority }}
+            </div>
+
+        </div>
+
+
+        {% if form.errors %}
+            <div class="form-errors">
+                Please correct the highlighted fields.
+            </div>
+        {% endif %}
+
+
+        <button
+            type="submit"
+            class="submit-button match-submit"
+        >
+            🎯 Find My Matches
+        </button>
+
+    </form>
+
+
+    {% if has_results %}
+
+        <section class="match-results">
+
+            <div class="match-results-heading">
+
+                <div>
+                    <span class="section-kicker">YOUR RESULTS</span>
+                    <h2>Best matching cars</h2>
+                </div>
+
+                <span class="match-results-count">
+                    {{ results|length }} matches
+                </span>
+
+            </div>
+
+
+            <div class="match-grid">
+
+                {% for vehicle in results %}
+
+                    <article class="match-card">
+
+                        <a
+                            href="{% url 'vehicles:vehicle_detail' vehicle.pk %}"
+                            class="match-image-link"
+                        >
+
+                            {% if vehicle.image %}
+
+                                <img
+                                    src="{{ vehicle.image.url }}"
+                                    alt="{{ vehicle.make }} {{ vehicle.model }}"
+                                >
+
+                            {% else %}
+
+                                <div class="match-placeholder">🚗</div>
+
+                            {% endif %}
+
+                        </a>
+
+
+                        <div class="match-content">
+
+                            <div class="match-score-row">
+
+                                <div>
+
+                                    <span class="match-score-number">
+                                        {{ vehicle.premier_match_data.score }}%
+                                    </span>
+
+                                    <span class="match-score-label">
+                                        {{ vehicle.premier_match_data.label }}
+                                    </span>
+
+                                </div>
+
+
+                                <span class="mini-premier-score">
+                                    ⭐ {{ vehicle.premier_match_data.premier_score.score }}/100
+                                </span>
+
+                            </div>
+
+
+                            <a
+                                href="{% url 'vehicles:vehicle_detail' vehicle.pk %}"
+                                class="match-title-link"
+                            >
+                                <h3>
+                                    {{ vehicle.make }} {{ vehicle.model }}
+                                </h3>
+                            </a>
+
+
+                            <p class="match-subtitle">
+                                {{ vehicle.year }} ·
+                                {{ vehicle.mileage|indian_number }} km ·
+                                {{ vehicle.fuel_type }}
+                            </p>
+
+
+                            <strong class="match-price">
+                                {{ vehicle.price|indian_currency }}
+                            </strong>
+
+
+                            <div class="match-meta">
+
+                                <span>⚙️ {{ vehicle.transmission }}</span>
+
+                                {% if vehicle.location %}
+                                    <span>📍 {{ vehicle.location }}</span>
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="match-breakdown">
+
+                                {% for item in vehicle.premier_match_data.breakdown %}
+
+                                    <div class="match-breakdown-row">
+
+                                        <span>{{ item.label }}</span>
+
+                                        <strong>
+                                            {{ item.points }}/{{ item.max_points }}
+                                        </strong>
+
+                                    </div>
+
+                                {% endfor %}
+
+                            </div>
+
+
+                            <a
+                                href="{% url 'vehicles:vehicle_detail' vehicle.pk %}"
+                                class="match-details-link"
+                            >
+                                View Vehicle →
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+    {% elif request.GET %}
+
+        <div class="empty-state match-empty">
+
+            <div class="empty-icon">🎯</div>
+
+            <h2>No strong matches found</h2>
+
+            <p>
+                Try widening your budget, location, year or mileage preferences.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+
+    <div class="match-explanation">
+
+        <strong>ⓘ How PremierMatch works</strong>
+
+        <p>
+            PremierMatch is a transparent rule-based recommendation tool.
+            It compares budget, fuel, transmission, year, mileage, location
+            and your selected priority. It is a preference match, not an
+            objective ranking of which car is "best."
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}

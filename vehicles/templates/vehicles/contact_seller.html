@@ -1,0 +1,126 @@
+{% extends "vehicles/base.html" %}
+
+{% load vehicle_tags %}
+
+{% block title %}
+    Contact Seller | {{ vehicle.make }} {{ vehicle.model }}
+{% endblock %}
+
+{% block content %}
+
+<div class="contact-page">
+
+    <a href="{% url 'vehicles:vehicle_detail' vehicle.pk %}" class="back-link">
+        ← Back to vehicle
+    </a>
+
+    <div class="contact-layout">
+
+        <section class="contact-form-card">
+
+            <span class="section-kicker">
+                BUYER ENQUIRY
+            </span>
+
+            <h1>
+                Contact the Seller
+            </h1>
+
+            <p class="contact-intro">
+                Send a message about this vehicle. Your enquiry will appear in the seller's dashboard.
+            </p>
+
+            {% if form.non_field_errors %}
+                <div class="form-errors">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <form method="POST" class="vehicle-form">
+
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="{{ form.buyer_name.id_for_label }}">
+                        Your Name
+                    </label>
+                    {{ form.buyer_name }}
+                    {{ form.buyer_name.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.buyer_phone.id_for_label }}">
+                        Your Phone Number
+                    </label>
+                    {{ form.buyer_phone }}
+                    {{ form.buyer_phone.errors }}
+                </div>
+
+                <div class="form-group">
+                    <label for="{{ form.message.id_for_label }}">
+                        Message
+                    </label>
+                    {{ form.message }}
+                    {{ form.message.errors }}
+                </div>
+
+                <button type="submit" class="submit-button">
+                    Send Enquiry →
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <aside class="contact-vehicle-card">
+
+            <span class="section-kicker">
+                INTERESTED IN
+            </span>
+
+            {% if vehicle.image %}
+                <img
+                    src="{{ vehicle.image.url }}"
+                    alt="{{ vehicle.make }} {{ vehicle.model }}"
+                    class="contact-vehicle-image"
+                >
+            {% else %}
+                <div class="contact-vehicle-placeholder">
+                    🚗
+                </div>
+            {% endif %}
+
+            <h2>
+                {{ vehicle.make }} {{ vehicle.model }}
+            </h2>
+
+            <p class="contact-vehicle-year">
+                {{ vehicle.year }} model
+            </p>
+
+            <strong class="contact-vehicle-price">
+                {{ vehicle.price|indian_currency }}
+            </strong>
+
+            <div class="contact-vehicle-meta">
+                <span>{{ vehicle.mileage|indian_number }} km</span>
+                <span>{{ vehicle.fuel_type }}</span>
+                <span>{{ vehicle.transmission }}</span>
+            </div>
+
+            <div class="seller-mini-card">
+                <small>SELLER</small>
+                <strong>{{ vehicle.seller.username }}</strong>
+                {% if vehicle.location %}
+                    <span>📍 {{ vehicle.location }}</span>
+                {% endif %}
+            </div>
+
+        </aside>
+
+    </div>
+
+</div>
+
+{% endblock %}

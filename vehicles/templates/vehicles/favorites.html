@@ -1,0 +1,221 @@
+{% extends "vehicles/base.html" %}
+
+{% load vehicle_tags %}
+
+{% block title %}
+    Saved Cars | Premier Wheels India
+{% endblock %}
+
+{% block content %}
+
+<div class="favorites-page">
+
+    <div class="favorites-header">
+
+        <div>
+
+            <span class="section-kicker">
+                YOUR SHORTLIST
+            </span>
+
+            <h1>
+                Saved Cars
+            </h1>
+
+            <p>
+                Cars you've saved for later.
+            </p>
+
+        </div>
+
+
+        <a
+            href="{% url 'vehicles:home' %}"
+            class="nav-button dashboard-browse"
+        >
+            Browse Cars
+        </a>
+
+    </div>
+
+
+    {% if favorite_items %}
+
+        <div class="favorites-count-row">
+
+            <strong>
+                {{ favorite_items|length }}
+            </strong>
+
+            <span>
+                saved {% if favorite_items|length == 1 %}car{% else %}cars{% endif %}
+            </span>
+
+        </div>
+
+
+        <div class="favorites-grid">
+
+            {% for item in favorite_items %}
+
+                {% with vehicle=item.vehicle %}
+
+                    <article class="favorite-card">
+
+                        <a
+                            href="{% url 'vehicles:vehicle_detail' vehicle.pk %}"
+                            class="favorite-card-image-link"
+                        >
+
+                            {% if vehicle.image %}
+
+                                <img
+                                    src="{{ vehicle.image.url }}"
+                                    alt="{{ vehicle.make }} {{ vehicle.model }}"
+                                >
+
+                            {% else %}
+
+                                <div class="favorite-placeholder">
+                                    🚗
+                                </div>
+
+                            {% endif %}
+
+                        </a>
+
+
+                        <div class="favorite-card-content">
+
+                            <div class="favorite-card-top">
+
+                                <div>
+
+                                    <a
+                                        href="{% url 'vehicles:vehicle_detail' vehicle.pk %}"
+                                        class="favorite-title-link"
+                                    >
+                                        <h2>
+                                            {{ vehicle.make }}
+                                            {{ vehicle.model }}
+                                        </h2>
+                                    </a>
+
+                                    <p>
+                                        {{ vehicle.year }} ·
+                                        {{ vehicle.mileage|indian_number }} km
+                                    </p>
+
+                                </div>
+
+
+                                <form
+                                    method="POST"
+                                    action="{% url 'vehicles:toggle_favorite' vehicle.pk %}"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <input
+                                        type="hidden"
+                                        name="next"
+                                        value="{% url 'vehicles:favorites' %}"
+                                    >
+
+                                    <button
+                                        type="submit"
+                                        class="favorite-button is-favorite favorite-remove-button"
+                                        title="Remove from Saved Cars"
+                                        aria-label="Remove from Saved Cars"
+                                    >
+                                        ♥
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+
+                            <strong class="favorite-price">
+                                {{ vehicle.price|indian_currency }}
+                            </strong>
+
+
+                            <div class="favorite-meta">
+
+                                <span>
+                                    ⛽ {{ vehicle.fuel_type }}
+                                </span>
+
+                                <span>
+                                    ⚙️ {{ vehicle.transmission }}
+                                </span>
+
+                                {% if vehicle.location %}
+                                    <span>
+                                        📍 {{ vehicle.location }}
+                                    </span>
+                                {% endif %}
+
+                            </div>
+
+
+                            <p class="favorite-description">
+                                {{ vehicle.short_description|truncatechars:130 }}
+                            </p>
+
+
+                            <div class="favorite-footer">
+
+                                <span>
+                                    👤 {{ vehicle.seller.username }}
+                                </span>
+
+                                <a
+                                    href="{% url 'vehicles:vehicle_detail' vehicle.pk %}"
+                                >
+                                    View Details →
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                {% endwith %}
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state favorites-empty">
+
+            <div class="empty-icon">
+                ♡
+            </div>
+
+            <h2>
+                No saved cars yet
+            </h2>
+
+            <p>
+                Browse the marketplace and save cars you want to compare later.
+            </p>
+
+            <a
+                href="{% url 'vehicles:home' %}"
+                class="submit-button favorites-browse-button"
+            >
+                Browse Cars
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

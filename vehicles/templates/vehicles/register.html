@@ -1,0 +1,116 @@
+{% extends "vehicles/base.html" %}
+
+{% block title %}
+    Register | Premier Wheels India
+{% endblock %}
+
+{% block content %}
+
+<div class="auth-container">
+
+    <div class="auth-card">
+
+        <span class="section-kicker">
+            JOIN THE MARKETPLACE
+        </span>
+
+        <h1>
+            Create Account
+        </h1>
+
+        <p class="auth-subtitle">
+            Create an account to sell your car and contact sellers.
+        </p>
+
+
+        {% if form.non_field_errors %}
+
+            <div class="form-errors">
+                {{ form.non_field_errors }}
+            </div>
+
+        {% endif %}
+
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            <div class="form-group">
+
+                <label for="{{ form.username.id_for_label }}">
+                    Username
+                </label>
+
+                {{ form.username }}
+
+                {{ form.username.errors }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.email.id_for_label }}">
+                    Email
+                </label>
+
+                {{ form.email }}
+
+                {{ form.email.errors }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.password1.id_for_label }}">
+                    Password
+                </label>
+
+                {{ form.password1 }}
+
+                {{ form.password1.errors }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.password2.id_for_label }}">
+                    Confirm Password
+                </label>
+
+                {{ form.password2 }}
+
+                {{ form.password2.errors }}
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="submit-button"
+            >
+                Create Account
+            </button>
+
+        </form>
+
+
+        <p class="auth-link">
+
+            Already have an account?
+
+            <a href="{% url 'vehicles:login' %}">
+                Login
+            </a>
+
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}

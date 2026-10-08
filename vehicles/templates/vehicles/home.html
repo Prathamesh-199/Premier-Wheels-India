@@ -1,0 +1,759 @@
+{% extends "vehicles/base.html" %}
+
+{% load vehicle_tags %}
+
+{% block title %}
+    Premier Wheels India | Buy & Sell Used Cars
+{% endblock %}
+
+{% block content %}
+
+<section class="hero-section">
+
+    <div class="hero-inner">
+
+        <div class="hero-copy">
+
+            <span class="eyebrow">
+                🇮🇳 India's used-car marketplace
+            </span>
+
+            <h1>
+                Find a car you’ll
+                <span>love to drive.</span>
+            </h1>
+
+            <p>
+                Browse trusted pre-owned vehicles or list your own car
+                and connect directly with buyers.
+            </p>
+
+            <div class="hero-stats">
+
+                <div>
+                    <strong>{{ vehicles|length }}+</strong>
+                    <span>Cars Listed</span>
+                </div>
+
+                <div>
+                    <strong>100%</strong>
+                    <span>Seller Listed</span>
+                </div>
+
+                <div>
+                    <strong>Direct</strong>
+                    <span>Seller Contact</span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="hero-card">
+
+            <div class="hero-card-icon">
+                🚘
+            </div>
+
+            <div>
+                <strong>
+                    Selling your car?
+                </strong>
+
+                <p>
+                    List it in minutes and let buyers contact you directly.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<div class="marketplace-layout">
+
+    <!-- INVENTORY -->
+
+    <section class="inventory-section">
+
+        <div class="section-heading">
+
+            <div>
+
+                <span class="section-kicker">
+                    HANDPICKED LISTINGS
+                </span>
+
+                <h2>
+                    Current Inventory
+                </h2>
+
+            </div>
+
+
+            <span class="inventory-count">
+                {{ vehicles|length }} available
+            </span>
+
+        </div>
+
+
+        <!-- SEARCH AND FILTERS -->
+
+        <form method="GET" action="{% url 'vehicles:home' %}" class="search-panel">
+
+            <div class="search-main-row">
+
+                <div class="search-box">
+                    <span class="search-icon">⌕</span>
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ search_query }}"
+                        placeholder="Search make, model, location..."
+                        autocomplete="off"
+                    >
+                </div>
+
+                <button type="submit" class="search-button">
+                    Search Cars
+                </button>
+
+                {% if search_query or selected_make or selected_fuel or selected_transmission or selected_year or selected_location or min_price or max_price or selected_sort != "newest" %}
+                    <a href="{% url 'vehicles:home' %}" class="clear-filters">
+                        Clear
+                    </a>
+                {% endif %}
+
+            </div>
+
+
+            <div class="filter-grid">
+
+                <div class="filter-group">
+                    <label for="make-filter">Make</label>
+                    <select id="make-filter" name="make">
+                        <option value="">Any Make</option>
+                        {% for item in makes %}
+                            <option value="{{ item }}" {% if selected_make == item %}selected{% endif %}>
+                                {{ item }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+
+                <div class="filter-group">
+                    <label for="fuel-filter">Fuel</label>
+                    <select id="fuel-filter" name="fuel">
+                        <option value="">Any Fuel</option>
+                        {% for value, label in fuel_choices %}
+                            <option value="{{ value }}" {% if selected_fuel == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+
+                <div class="filter-group">
+                    <label for="transmission-filter">Transmission</label>
+                    <select id="transmission-filter" name="transmission">
+                        <option value="">Any Transmission</option>
+                        {% for value, label in transmission_choices %}
+                            <option value="{{ value }}" {% if selected_transmission == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+
+                <div class="filter-group">
+                    <label for="year-filter">Year</label>
+                    <select id="year-filter" name="year">
+                        <option value="">Any Year</option>
+                        {% for item in years %}
+                            <option value="{{ item }}" {% if selected_year == item|stringformat:"s" %}selected{% endif %}>
+                                {{ item }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+
+                <div class="filter-group">
+                    <label for="min-price">Min Price</label>
+                    <input
+                        id="min-price"
+                        type="text"
+                        name="min_price"
+                        value="{{ min_price }}"
+                        class="filter-price-input"
+                        placeholder="₹50,000"
+                        inputmode="numeric"
+                    >
+                </div>
+
+
+                <div class="filter-group">
+                    <label for="max-price">Max Price</label>
+                    <input
+                        id="max-price"
+                        type="text"
+                        name="max_price"
+                        value="{{ max_price }}"
+                        class="filter-price-input"
+                        placeholder="₹1,00,00,000"
+                        inputmode="numeric"
+                    >
+                </div>
+
+
+                <div class="filter-group location-filter">
+                    <label for="location-filter">Location</label>
+                    <input
+                        id="location-filter"
+                        type="text"
+                        name="location"
+                        value="{{ selected_location }}"
+                        placeholder="e.g. Nashik, Pune, Mumbai"
+                    >
+                </div>
+
+
+                <div class="filter-group">
+                    <label for="sort-filter">Sort By</label>
+                    <select id="sort-filter" name="sort">
+                        <option value="newest" {% if selected_sort == "newest" %}selected{% endif %}>Newest</option>
+                        <option value="price_low" {% if selected_sort == "price_low" %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_high" {% if selected_sort == "price_high" %}selected{% endif %}>Price: High to Low</option>
+                        <option value="mileage_low" {% if selected_sort == "mileage_low" %}selected{% endif %}>Mileage: Low to High</option>
+                        <option value="mileage_high" {% if selected_sort == "mileage_high" %}selected{% endif %}>Mileage: High to Low</option>
+                        <option value="year_new" {% if selected_sort == "year_new" %}selected{% endif %}>Year: Newest First</option>
+                        <option value="year_old" {% if selected_sort == "year_old" %}selected{% endif %}>Year: Oldest First</option>
+                    </select>
+                </div>
+
+            </div>
+
+        </form>
+
+
+        <div class="premier-score-info">
+
+            <div class="premier-score-info-icon">
+                ⭐
+            </div>
+
+            <div>
+                <strong>
+                    Meet PremierScore
+                </strong>
+
+                <p>
+                    A comparative indicator of listing and value strength.
+                    It does not mean one car is universally better than another;
+                    it compares a listing with relevant vehicles and available information.
+                </p>
+            </div>
+
+            <a
+                href="{% url 'vehicles:premier_match' %}"
+                class="score-info-link"
+            >
+                Find My Match →
+            </a>
+
+        </div>
+
+
+        {% if vehicles %}
+
+            <div class="vehicle-grid">
+
+                {% for vehicle in vehicles %}
+
+                    <article class="vehicle-card">
+
+                        <a
+                            href="{% url 'vehicles:vehicle_detail' vehicle.pk %}"
+                            class="vehicle-card-main-link"
+                        >
+
+                            <div class="vehicle-image-wrap">
+
+                                {% if vehicle.image %}
+
+                                    <img
+                                        src="{{ vehicle.image.url }}"
+                                        alt="{{ vehicle.make }} {{ vehicle.model }}"
+                                        class="vehicle-image"
+                                    >
+
+                                {% else %}
+
+                                    <div class="vehicle-placeholder">
+                                        🚗
+                                    </div>
+
+                                {% endif %}
+
+
+                                <span class="used-badge">
+                                    PRE-OWNED
+                                </span>
+
+
+                                <span class="image-arrow">
+                                    ↗
+                                </span>
+
+                            </div>
+
+
+                            <div class="vehicle-content">
+
+                                <div class="vehicle-title-row">
+
+                                    <div>
+
+                                        <h3>
+                                            {{ vehicle.make }}
+                                            {{ vehicle.model }}
+                                        </h3>
+
+                                        <p class="vehicle-year">
+                                            {{ vehicle.year }}
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+
+                                <p class="vehicle-price">
+                                    {{ vehicle.price|indian_currency }}
+                                </p>
+
+
+                                <div class="premier-score-card-badge">
+
+                                    <span class="premier-score-number">
+                                        ⭐ {{ vehicle.premier_score_data.score }}/100
+                                    </span>
+
+                                    <span class="premier-score-label">
+                                        {{ vehicle.premier_score_data.label }}
+                                    </span>
+
+                                </div>
+
+
+                                <div class="vehicle-details">
+
+                                    <span>
+                                        🛣
+                                        {{ vehicle.mileage|indian_number }}
+                                        km
+                                    </span>
+
+                                    <span>
+                                        ⛽
+                                        {{ vehicle.fuel_type }}
+                                    </span>
+
+                                    <span>
+                                        ⚙️
+                                        {{ vehicle.transmission }}
+                                    </span>
+
+                                </div>
+
+
+                                <div class="vehicle-location">
+
+                                    <span>📍</span>
+
+                                    {% if vehicle.location %}
+                                        {{ vehicle.location }}
+                                    {% else %}
+                                        Location not specified
+                                    {% endif %}
+
+                                </div>
+
+
+                                <p class="card-description">
+                                    {{ vehicle.short_description|truncatechars:100 }}
+                                </p>
+
+
+                                <div class="card-footer">
+
+                                    <span class="seller-mini">
+                                        👤 {{ vehicle.seller.username }}
+                                    </span>
+
+                                    <span class="view-details">
+                                        View Details →
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+
+                        {% if user.is_authenticated %}
+
+                            <form
+                                method="POST"
+                                action="{% url 'vehicles:toggle_favorite' vehicle.pk %}"
+                                class="favorite-card-form"
+                            >
+
+                                {% csrf_token %}
+
+                                <input
+                                    type="hidden"
+                                    name="next"
+                                    value="{{ request.get_full_path }}"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="favorite-button favorite-card-button {% if vehicle.pk in favorite_vehicle_ids %}is-favorite{% endif %}"
+                                    aria-label="{% if vehicle.pk in favorite_vehicle_ids %}Remove {{ vehicle.make }} {{ vehicle.model }} from saved cars{% else %}Save {{ vehicle.make }} {{ vehicle.model }}{% endif %}"
+                                    title="{% if vehicle.pk in favorite_vehicle_ids %}Remove from Saved Cars{% else %}Save to Saved Cars{% endif %}"
+                                >
+                                    {% if vehicle.pk in favorite_vehicle_ids %}
+                                        ♥
+                                    {% else %}
+                                        ♡
+                                    {% endif %}
+                                </button>
+
+                            </form>
+
+                        {% endif %}
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <div class="empty-icon">
+                    🚘
+                </div>
+
+                <h3>
+                    No vehicles listed yet
+                </h3>
+
+                <p>
+                    Be the first seller to list a vehicle.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- LIST FORM -->
+
+    <aside class="form-card">
+
+        <div class="form-card-top">
+
+            <span class="form-kicker">
+                SELL YOUR CAR
+            </span>
+
+            <h2>
+                List Your Vehicle
+            </h2>
+
+            <p>
+                Add your vehicle details and reach interested buyers.
+            </p>
+
+        </div>
+
+
+        {% if not user.is_authenticated %}
+
+            <div class="login-warning">
+
+                <strong>
+                    Want to sell a car?
+                </strong>
+
+                <span>
+
+                    Please
+
+                    <a href="{% url 'vehicles:login' %}">
+                        login
+                    </a>
+
+                    or
+
+                    <a href="{% url 'vehicles:register' %}">
+                        register
+                    </a>
+
+                    first.
+
+                </span>
+
+            </div>
+
+        {% endif %}
+
+
+        <form
+            method="POST"
+            action="{% url 'vehicles:add_vehicle' %}"
+            enctype="multipart/form-data"
+            class="vehicle-form"
+        >
+
+            {% csrf_token %}
+
+
+            {% if form.non_field_errors %}
+
+                <div class="form-errors">
+                    {{ form.non_field_errors }}
+                </div>
+
+            {% endif %}
+
+
+            <div class="form-group">
+
+                <label for="{{ form.make.id_for_label }}">
+                    Make
+                </label>
+
+                {{ form.make }}
+
+                {{ form.make.errors }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.model.id_for_label }}">
+                    Model
+                </label>
+
+                {{ form.model }}
+
+                {{ form.model.errors }}
+
+            </div>
+
+
+            <div class="two-column-form">
+
+                <div class="form-group">
+
+                    <label for="{{ form.year.id_for_label }}">
+                        Year
+                    </label>
+
+                    {{ form.year }}
+
+                    {{ form.year.errors }}
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="{{ form.fuel_type.id_for_label }}">
+                        Fuel Type
+                    </label>
+
+                    {{ form.fuel_type }}
+
+                    {{ form.fuel_type.errors }}
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.price.id_for_label }}">
+                    Price
+                </label>
+
+                {{ form.price }}
+
+                {{ form.price.errors }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.mileage.id_for_label }}">
+                    Mileage
+                </label>
+
+                {{ form.mileage }}
+
+                {{ form.mileage.errors }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.engine_specs.id_for_label }}">
+                    Engine Specs
+                </label>
+
+                {{ form.engine_specs }}
+
+                {{ form.engine_specs.errors }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.transmission.id_for_label }}">
+                    Transmission
+                </label>
+
+                {{ form.transmission }}
+
+                {{ form.transmission.errors }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.location.id_for_label }}">
+                    Location
+                </label>
+
+                {{ form.location }}
+
+                {{ form.location.errors }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.seller_phone.id_for_label }}">
+                    Seller Phone
+                </label>
+
+                {{ form.seller_phone }}
+
+                {{ form.seller_phone.errors }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.seller_email.id_for_label }}">
+                    Seller Email
+                </label>
+
+                {{ form.seller_email }}
+
+                {{ form.seller_email.errors }}
+
+                <small class="field-help">
+                    Buyers can use this email to contact you about this car.
+                </small>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.short_description.id_for_label }}">
+                    Description
+                </label>
+
+                {{ form.short_description }}
+
+                {{ form.short_description.errors }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.image.id_for_label }}">
+                    Vehicle Image
+                </label>
+
+                {{ form.image }}
+
+                {{ form.image.errors }}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="id_photos">
+                    Additional Photos
+                </label>
+
+                <input
+                    type="file"
+                    name="photos"
+                    id="id_photos"
+                    class="input image-input"
+                    accept="image/*"
+                    multiple
+                >
+
+                <small class="field-help">
+                    Upload up to 8 additional photos — exterior, interior,
+                    dashboard, rear, tyres, engine, etc.
+                </small>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="submit-button"
+            >
+                <span>🚘</span>
+                List Vehicle
+            </button>
+
+        </form>
+
+    </aside>
+
+</div>
+
+{% endblock %}

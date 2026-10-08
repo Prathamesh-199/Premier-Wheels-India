@@ -1,0 +1,789 @@
+{% extends "vehicles/base.html" %}
+
+{% load vehicle_tags %}
+
+{% block title %}
+    {{ vehicle.make }} {{ vehicle.model }} | Premier Wheels India
+{% endblock %}
+
+{% block content %}
+
+<div class="detail-page">
+
+    <a
+        href="{% url 'vehicles:home' %}"
+        class="back-link"
+    >
+        ← Back to all vehicles
+    </a>
+
+
+    <div class="detail-layout">
+
+        <!-- MAIN VEHICLE CONTENT -->
+
+        <section class="detail-main">
+
+            <div class="detail-gallery">
+
+                <div class="detail-image-card">
+
+                    {% if vehicle.image %}
+
+                        <img
+                            src="{{ vehicle.image.url }}"
+                            alt="{{ vehicle.make }} {{ vehicle.model }}"
+                            class="detail-image gallery-main-image"
+                            id="mainVehicleImage"
+                        >
+
+                    {% elif vehicle_photos %}
+
+                        <img
+                            src="{{ vehicle_photos.0.image.url }}"
+                            alt="{{ vehicle.make }} {{ vehicle.model }}"
+                            class="detail-image gallery-main-image"
+                            id="mainVehicleImage"
+                        >
+
+                    {% else %}
+
+                        <div
+                            class="detail-image-placeholder"
+                            id="mainVehicleImage"
+                        >
+                            🚗
+                        </div>
+
+                    {% endif %}
+
+
+                    <div class="detail-image-badge">
+                        PRE-OWNED
+                    </div>
+
+                </div>
+
+
+                {% if vehicle.image or vehicle_photos %}
+
+                    <div class="photo-thumbnails" id="vehiclePhotoGallery">
+
+                        {% if vehicle.image %}
+
+                            <button
+                                type="button"
+                                class="photo-thumbnail active"
+                                data-image="{{ vehicle.image.url }}"
+                                aria-label="Main vehicle photo"
+                            >
+
+                                <img
+                                    src="{{ vehicle.image.url }}"
+                                    alt="Main vehicle photo"
+                                >
+
+                            </button>
+
+                        {% endif %}
+
+
+                        {% for photo in vehicle_photos %}
+
+                            <button
+                                type="button"
+                                class="photo-thumbnail {% if not vehicle.image and forloop.first %}active{% endif %}"
+                                data-image="{{ photo.image.url }}"
+                                aria-label="Vehicle photo {{ forloop.counter }}"
+                            >
+
+                                <img
+                                    src="{{ photo.image.url }}"
+                                    alt="Vehicle photo {{ forloop.counter }}"
+                                >
+
+                            </button>
+
+                        {% endfor %}
+
+                    </div>
+
+                    <p class="photo-count">
+                        {% if vehicle.image %}
+                            {{ vehicle_photos|length|add:"1" }} photos
+                        {% else %}
+                            {{ vehicle_photos|length }} photos
+                        {% endif %}
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="detail-info-card">
+
+                <div class="detail-heading">
+
+                    <div>
+
+                        <span class="detail-year">
+                            {{ vehicle.year }} model
+                        </span>
+
+                        <h1>
+                            {{ vehicle.make }}
+                            {{ vehicle.model }}
+                        </h1>
+
+                        <p class="detail-location">
+                            📍
+
+                            {% if vehicle.location %}
+                                {{ vehicle.location }}
+                            {% else %}
+                                Location not specified
+                            {% endif %}
+
+                        </p>
+
+                    </div>
+
+
+                    <div class="detail-price-block">
+
+                        <div class="detail-price">
+                            {{ vehicle.price|indian_currency }}
+                        </div>
+
+
+                        {% if user.is_authenticated %}
+
+                            <form
+                                method="POST"
+                                action="{% url 'vehicles:toggle_favorite' vehicle.pk %}"
+                                class="detail-favorite-form"
+                            >
+
+                                {% csrf_token %}
+
+                                <input
+                                    type="hidden"
+                                    name="next"
+                                    value="{{ request.get_full_path }}"
+                                >
+
+                                <button
+                                    type="submit"
+                                    class="favorite-button detail-favorite-button {% if is_favorited %}is-favorite{% endif %}"
+                                >
+                                    {% if is_favorited %}
+                                        ♥ Saved
+                                    {% else %}
+                                        ♡ Save Car
+                                    {% endif %}
+                                </button>
+
+                            </form>
+
+                        {% else %}
+
+                            <a
+                                href="{% url 'vehicles:login' %}?next={{ request.path }}"
+                                class="favorite-login-link"
+                            >
+                                ♡ Save Car
+                            </a>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="spec-grid">
+
+                    <div class="spec-box">
+
+                        <span class="spec-icon">
+                            🛣
+                        </span>
+
+                        <div>
+
+                            <small>
+                                Mileage
+                            </small>
+
+                            <strong>
+                                {{ vehicle.mileage|indian_number }}
+                                km
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="spec-box">
+
+                        <span class="spec-icon">
+                            ⛽
+                        </span>
+
+                        <div>
+
+                            <small>
+                                Fuel Type
+                            </small>
+
+                            <strong>
+                                {{ vehicle.fuel_type }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="spec-box">
+
+                        <span class="spec-icon">
+                            ⚙️
+                        </span>
+
+                        <div>
+
+                            <small>
+                                Transmission
+                            </small>
+
+                            <strong>
+                                {{ vehicle.transmission }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="spec-box">
+
+                        <span class="spec-icon">
+                            🔧
+                        </span>
+
+                        <div>
+
+                            <small>
+                                Engine
+                            </small>
+
+                            <strong>
+                                {{ vehicle.engine_specs }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="spec-box">
+
+                        <span class="spec-icon">
+                            👤
+                        </span>
+
+                        <div>
+
+                            <small>
+                                Seller
+                            </small>
+
+                            <strong>
+                                {{ vehicle.seller.username }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="spec-box">
+
+                        <span class="spec-icon">
+                            📅
+                        </span>
+
+                        <div>
+
+                            <small>
+                                Listed
+                            </small>
+
+                            <strong>
+                                {{ vehicle.created_at|date:"d M Y" }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="premier-score-detail-card">
+
+                    <div class="premier-score-detail-top">
+
+                        <div>
+
+                            <span class="section-kicker">
+                                PREMIER WHEELS INDICATOR
+                            </span>
+
+                            <h2>
+                                ⭐ PremierScore
+                            </h2>
+
+                        </div>
+
+
+                        <div class="premier-score-detail-number">
+                            {{ premier_score_data.score }}/100
+                        </div>
+
+                    </div>
+
+
+                    <div class="premier-score-detail-label">
+                        {{ premier_score_data.label }}
+                    </div>
+
+
+                    <p class="premier-score-detail-text">
+                        This is a comparative listing/value indicator, not a
+                        universal ranking of the "best" cars.
+                    </p>
+
+
+                    <div class="premier-score-breakdown">
+
+                        {% for item in premier_score_data.breakdown %}
+
+                            <div class="score-breakdown-row">
+
+                                <span>{{ item.label }}</span>
+
+                                <strong>
+                                    {{ item.points }}/{{ item.max_points }}
+                                </strong>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <div class="premier-score-comparison-note">
+
+                        <strong>Comparison basis:</strong>
+                        {{ premier_score_data.comparison_basis }}.
+
+                        {% if premier_score_data.comparable_count %}
+                            Based on {{ premier_score_data.comparable_count }}
+                            comparable listing{{ premier_score_data.comparable_count|pluralize }}.
+                        {% endif %}
+
+                        <br>
+
+                        {{ premier_score_data.price_note }}
+
+                    </div>
+
+
+                    <details class="premier-score-details">
+
+                        <summary>
+                            ⓘ How PremierScore works
+                        </summary>
+
+                        <p>
+                            PremierScore considers price competitiveness,
+                            mileage for vehicle age, vehicle age, photos,
+                            listing completeness and seller information.
+                            It is designed to help buyers compare relevant
+                            listings, not to decide which car is universally better.
+                        </p>
+
+                    </details>
+
+                </div>
+
+
+                <div class="description-section">
+
+                    <h2>
+                        About this vehicle
+                    </h2>
+
+                    <p>
+                        {{ vehicle.short_description }}
+                    </p>
+
+                </div>
+
+
+                <section
+                    class="ownership-calculator"
+                    id="ownership-calculator"
+                    data-fuel-type="{{ vehicle.fuel_type|lower }}"
+                >
+
+                    <div class="ownership-heading">
+
+                        <div>
+
+                            <span class="section-kicker">
+                                SMART BUYING TOOL
+                            </span>
+
+                            <h2>
+                                💰 Ownership Estimate
+                            </h2>
+
+                            <p>
+                                Enter your assumptions to estimate annual and
+                                five-year running cost. This is a planning
+                                estimate, not an insurance or service quote.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="ownership-form-grid">
+
+                        <div class="form-group">
+
+                            <label for="ownershipAnnualKm">
+                                Annual driving (km)
+                            </label>
+
+                            <input
+                                id="ownershipAnnualKm"
+                                class="input"
+                                type="number"
+                                min="100"
+                                value="10000"
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="ownershipFuelPrice">
+                                Fuel / energy price
+                            </label>
+
+                            <input
+                                id="ownershipFuelPrice"
+                                class="input"
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                placeholder="Enter local rate"
+                            >
+
+                            <small class="field-help">
+                                ₹/litre for petrol/diesel/hybrid, ₹/kg for CNG,
+                                or ₹/kWh for electric.
+                            </small>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="ownershipEfficiency">
+                                Estimated efficiency
+                            </label>
+
+                            <input
+                                id="ownershipEfficiency"
+                                class="input"
+                                type="number"
+                                min="1"
+                                step="0.1"
+                                value="15"
+                            >
+
+                            <small
+                                class="field-help"
+                                id="ownershipEfficiencyHint"
+                            >
+                                Example assumption — edit it for this car.
+                            </small>
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="ownershipInsurance">
+                                Insurance / year (optional)
+                            </label>
+
+                            <input
+                                id="ownershipInsurance"
+                                class="input"
+                                type="number"
+                                min="0"
+                                step="100"
+                                placeholder="₹0"
+                            >
+
+                        </div>
+
+
+                        <div class="form-group">
+
+                            <label for="ownershipMaintenance">
+                                Maintenance / year (optional)
+                            </label>
+
+                            <input
+                                id="ownershipMaintenance"
+                                class="input"
+                                type="number"
+                                min="0"
+                                step="100"
+                                placeholder="₹0"
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="submit-button ownership-calculate-button"
+                        id="calculateOwnership"
+                    >
+                        Calculate Ownership Cost
+                    </button>
+
+
+                    <div
+                        class="ownership-result"
+                        id="ownershipResult"
+                        hidden
+                    >
+
+                        <div class="ownership-result-grid">
+
+                            <div>
+                                <span>Estimated fuel/energy</span>
+                                <strong id="ownershipFuelCost">₹0</strong>
+                            </div>
+
+                            <div>
+                                <span>Estimated annual total</span>
+                                <strong id="ownershipAnnualTotal">₹0</strong>
+                            </div>
+
+                            <div>
+                                <span>Estimated 5-year total</span>
+                                <strong id="ownershipFiveYearTotal">₹0</strong>
+                            </div>
+
+                        </div>
+
+                        <p>
+                            Results use only the assumptions you entered.
+                            Actual fuel prices, efficiency, insurance and
+                            maintenance can vary.
+                        </p>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+        </section>
+
+
+        <!-- SELLER SIDEBAR -->
+
+        <aside class="seller-sidebar">
+
+            <div class="seller-card">
+
+                <span class="seller-label">
+                    SELLER
+                </span>
+
+                <div class="seller-avatar">
+                    {{ vehicle.seller.username|first|upper }}
+                </div>
+
+                <h2>
+                    {{ vehicle.seller.username }}
+                </h2>
+
+
+                <p class="seller-location">
+
+                    📍
+
+                    {% if vehicle.location %}
+                        {{ vehicle.location }}
+                    {% else %}
+                        Location not specified
+                    {% endif %}
+
+                </p>
+
+
+                <div class="seller-contact">
+
+                    {% if vehicle.seller_phone %}
+
+                        <a
+                            href="tel:{{ vehicle.seller_phone }}"
+                            class="contact-button primary"
+                        >
+                            📞 Call Seller
+                        </a>
+
+                    {% endif %}
+
+
+                    {% if request.user != vehicle.seller %}
+
+                        <a
+                            href="{% url 'vehicles:contact_seller' vehicle.pk %}"
+                            class="contact-button secondary"
+                        >
+                            💬 Send Enquiry
+                        </a>
+
+                    {% endif %}
+
+
+                    {% if vehicle.seller_email %}
+
+                        <a
+                            href="mailto:{{ vehicle.seller_email }}?subject=Interested in {{ vehicle.make }} {{ vehicle.model }} - Premier Wheels India"
+                            class="contact-button tertiary"
+                        >
+                            ✉️ Email Seller
+                        </a>
+
+                    {% endif %}
+
+
+                    {% if not vehicle.seller_phone and not vehicle.seller_email %}
+
+                        <p class="no-contact">
+                            Seller contact information is not available.
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="safe-buying">
+
+                    <strong>
+                        🛡 Safe Buying Tips
+                    </strong>
+
+                    <ul>
+
+                        <li>
+                            Inspect the car before paying.
+                        </li>
+
+                        <li>
+                            Verify the documents and registration.
+                        </li>
+
+                        <li>
+                            Avoid sending money before seeing the car.
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+
+            {% if similar_vehicles %}
+
+                <div class="similar-card">
+
+                    <h3>
+                        Similar Vehicles
+                    </h3>
+
+
+                    {% for car in similar_vehicles %}
+
+                        <a
+                            href="{% url 'vehicles:vehicle_detail' car.pk %}"
+                            class="similar-item"
+                        >
+
+                            {% if car.image %}
+
+                                <img
+                                    src="{{ car.image.url }}"
+                                    alt="{{ car.make }} {{ car.model }}"
+                                >
+
+                            {% else %}
+
+                                <div class="similar-placeholder">
+                                    🚗
+                                </div>
+
+                            {% endif %}
+
+
+                            <div>
+
+                                <strong>
+                                    {{ car.make }}
+                                    {{ car.model }}
+                                </strong>
+
+                                <span>
+                                    {{ car.price|indian_currency }}
+                                </span>
+
+                            </div>
+
+                        </a>
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        </aside>
+
+    </div>
+
+</div>
+
+{% endblock %}

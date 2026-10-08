@@ -1,0 +1,297 @@
+{% extends "vehicles/base.html" %}
+
+{% load vehicle_tags %}
+
+{% block title %}
+    My Dashboard | Premier Wheels India
+{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-container">
+
+    <div class="dashboard-header">
+
+        <div>
+
+            <span class="section-kicker">
+                SELLER AREA
+            </span>
+
+            <h1>
+                My Dashboard
+            </h1>
+
+            <p>
+                Welcome back, {{ user.username }}.
+            </p>
+
+        </div>
+
+
+        <div class="dashboard-header-actions">
+
+            <a
+                href="{% url 'vehicles:favorites' %}"
+                class="nav-button dashboard-saved"
+            >
+                ♥ Saved Cars
+                {% if favorite_count %}
+                    <span class="saved-count">{{ favorite_count }}</span>
+                {% endif %}
+            </a>
+
+
+            <a
+                href="{% url 'vehicles:home' %}"
+                class="nav-button dashboard-browse"
+            >
+                Browse Cars
+            </a>
+
+        </div>
+
+    </div>
+
+
+    {% if vehicles %}
+
+        <div class="dashboard-summary">
+
+            <div>
+
+                <strong>
+                    {{ vehicles|length }}
+                </strong>
+
+                <span>
+                    Total Listings
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-grid">
+
+            {% for vehicle in vehicles %}
+
+                <div class="dashboard-card">
+
+                    <a
+                        href="{% url 'vehicles:vehicle_detail' vehicle.pk %}"
+                        class="dashboard-image-link"
+                    >
+
+                        {% if vehicle.image %}
+
+                            <img
+                                src="{{ vehicle.image.url }}"
+                                alt="{{ vehicle.make }} {{ vehicle.model }}"
+                            >
+
+                        {% else %}
+
+                            <div class="dashboard-placeholder">
+                                🚗
+                            </div>
+
+                        {% endif %}
+
+                    </a>
+
+
+                    <div class="dashboard-content">
+
+                        <a
+                            href="{% url 'vehicles:vehicle_detail' vehicle.pk %}"
+                            class="dashboard-title-link"
+                        >
+
+                            <h3>
+                                {{ vehicle.make }}
+                                {{ vehicle.model }}
+                            </h3>
+
+                        </a>
+
+
+                        <div class="dashboard-meta">
+
+                            <span>
+                                {{ vehicle.year }}
+                            </span>
+
+                            <span>
+                                {{ vehicle.mileage|indian_number }} km
+                            </span>
+
+                            <span>
+                                {{ vehicle.fuel_type }}
+                            </span>
+
+                        </div>
+
+
+                        <strong class="dashboard-price">
+                            {{ vehicle.price|indian_currency }}
+                        </strong>
+
+                        <span class="dashboard-score">
+                            ⭐ {{ vehicle.premier_score_data.score }}/100
+                            · {{ vehicle.premier_score_data.label }}
+                        </span>
+
+
+                        {% if vehicle.location %}
+
+                            <p class="dashboard-location">
+                                📍 {{ vehicle.location }}
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="dashboard-actions">
+
+                        <a
+                            href="{% url 'vehicles:vehicle_detail' vehicle.pk %}"
+                            class="small-button"
+                        >
+                            View
+                        </a>
+
+
+                        <a
+                            href="{% url 'vehicles:edit_vehicle' vehicle.pk %}"
+                            class="small-button edit-button"
+                        >
+                            Edit
+                        </a>
+
+
+                        <form
+                            method="POST"
+                            action="{% url 'vehicles:delete_vehicle' vehicle.id %}"
+                            class="delete-form"
+                            onsubmit="return confirm('Are you sure you want to delete this vehicle listing?');"
+                        >
+
+                            {% csrf_token %}
+
+                            <button
+                                type="submit"
+                                class="delete-button"
+                            >
+                                Delete
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state dashboard-empty">
+
+            <div class="empty-icon">
+                🚘
+            </div>
+
+            <h2>
+                You haven't listed a car yet.
+            </h2>
+
+            <p>
+                Add your first vehicle and start receiving buyer enquiries.
+            </p>
+
+            <a
+                href="{% url 'vehicles:home' %}"
+                class="submit-button dashboard-add-button"
+            >
+                List a Vehicle
+            </a>
+
+        </div>
+
+    {% endif %}
+
+
+
+    {% if enquiries %}
+
+        <section class="dashboard-enquiries">
+
+            <div class="dashboard-section-heading">
+                <div>
+                    <span class="section-kicker">
+                        INBOX
+                    </span>
+                    <h2>
+                        Buyer Enquiries
+                    </h2>
+                    <p>
+                        Messages from people interested in your cars.
+                    </p>
+                </div>
+
+                <span class="enquiry-count">
+                    {{ enquiries|length }} enquiries
+                </span>
+            </div>
+
+            <div class="enquiry-list">
+
+                {% for enquiry in enquiries %}
+
+                    <article class="enquiry-card">
+
+                        <div class="enquiry-avatar">
+                            {{ enquiry.buyer_name|first|upper }}
+                        </div>
+
+                        <div class="enquiry-body">
+                            <div class="enquiry-topline">
+                                <h3>{{ enquiry.buyer_name }}</h3>
+                                <span>{{ enquiry.created_at|date:"d M Y, h:i A" }}</span>
+                            </div>
+
+                            <p class="enquiry-vehicle">
+                                Interested in <strong>{{ enquiry.vehicle.make }} {{ enquiry.vehicle.model }}</strong>
+                            </p>
+
+                            <p class="enquiry-message">
+                                {{ enquiry.message }}
+                            </p>
+
+                            <a
+                                href="tel:{{ enquiry.buyer_phone }}"
+                                class="enquiry-phone"
+                            >
+                                📞 {{ enquiry.buyer_phone }}
+                            </a>
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
